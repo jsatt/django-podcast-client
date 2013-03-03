@@ -14,14 +14,20 @@ class PodcastChannelAdmin(admin.ModelAdmin):
         for channel in queryset:
             channel.update_channel()
 
+    def save_model(self, request, obj, form, change):
+        obj.save()
+        obj.update_channel()
+
 
 class PodcastItemAdmin(admin.ModelAdmin):
-    actions = ('download_files', 'delete_files',)
+    actions = ('download_files', 'delete_files', 'mark_as_listened')
+    list_editable = ('listened',)
     list_display = ('title', 'channel', 'publish_date', 'file', 'listened')
-    list_filter = ('channel', )
+    list_filter = ('channel', 'listened')
+    ordering = ('-publish_date',)
     readonly_fields = ('title', 'channel', 'url', 'file', 'file_type',
                        'description', 'publish_date', 'guid')
-    search_fields = ('title',)
+    search_fields = ('title', 'description')
     
     def download_files(self, request, queryset):
         for item in queryset:
@@ -30,6 +36,9 @@ class PodcastItemAdmin(admin.ModelAdmin):
     def delete_files(self, request, queryset):
         for item in queryset:
             item.delete_file()
+
+    def mark_as_listened(self, request, queryset):
+        queryset.update(listened=True)
         
 
 admin.site.register(PodcastChannel, PodcastChannelAdmin)
