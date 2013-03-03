@@ -8,3 +8,6 @@ local_settings.py
 build
 dist
 /__init__.py
+/manage.py
+.coverage
+/test_env/

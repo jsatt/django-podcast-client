@@ -1,0 +1,16 @@
+pip>=0.8.2
+South
+Django
+django-extensions
+python-dateutil
+psycopg2
+requests
+lxml
+
+mox
+nose
+django-nose
+
+#jinja2
+#celery
+#django-celery
