@@ -7,16 +7,20 @@ command line tool, there is no need to run a Django instance as a service.
 Setup
 -----
 Install using pip:
+
     pip install git://github.com/jsatt/django-podcast-client.git
 
  
 Create new django instance (skip this if you already have one):
+
     django-admin.py startproject <project name>
     cd <project name>
     python manage.py syncdb
+
 run `chmod +x manage.py` to run as `./manage.py <command>` from here on out
 
 Add to installed apps in `<project name>/settings.py`:
+
     INSTALLED_APPS = (
         ...
         django_extensions,
@@ -25,9 +29,11 @@ Add to installed apps in `<project name>/settings.py`:
     )
 
 Setup the database:
+
     ./manage.py migrate podcast_client
 
 Add urls in `<project name>/urls.py` (skip if only using CLI):
+
     urlpatterns = ('',
     ...
     (r'^podcasts/', include('podcast_client.urls')),
@@ -36,9 +42,10 @@ Add urls in `<project name>/urls.py` (skip if only using CLI):
 Using in Browser
 ----------------
 Start Django server:
+
     ./manage.py runserver
 
-There are a slew of other ways to run as a service which I will leave up to you to reasearch.
-[](https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/)
+There are a slew of other ways to run as a service which I will leave up to you to research.
+[How to deploy with WSGI](https://docs.djangoproject.com/en/dev/howto/deployment/wsgi/)
 
 Browse to `http://<localhost or hostname>/podcasts/`.
