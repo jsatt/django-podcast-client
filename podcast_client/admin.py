@@ -1,13 +1,13 @@
 from django.contrib import admin
 
-from .models import PodcastChannel, PodcastItem
+from podcast_client.models import PodcastChannel, PodcastItem
 
 
 class PodcastChannelAdmin(admin.ModelAdmin):
     actions = ('update_channels',)
     list_display = ('title', 'download_new',)
-    readonly_fields = ('title', 'description', 'slug', 'cover', 'cover_url',
-                       'created', 'modified')
+    readonly_fields = ('title', 'description', 'slug', 'cover_url', 'created',
+                       'modified')
     search_fields = ('title',)
 
     def update_channels(self, request, queryset):
@@ -28,7 +28,7 @@ class PodcastItemAdmin(admin.ModelAdmin):
     readonly_fields = ('title', 'channel', 'url', 'file', 'file_type',
                        'description', 'publish_date', 'guid')
     search_fields = ('title', 'description')
-    
+
     def download_files(self, request, queryset):
         for item in queryset:
             item.download_file()
@@ -39,7 +39,7 @@ class PodcastItemAdmin(admin.ModelAdmin):
 
     def mark_as_listened(self, request, queryset):
         queryset.update(listened=True)
-        
+
 
 admin.site.register(PodcastChannel, PodcastChannelAdmin)
 admin.site.register(PodcastItem, PodcastItemAdmin)
