@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class PodcastChannel(TimeStampedModel):
     url = models.URLField(unique=True)
     title = models.CharField(max_length=255, blank=True)
-    slug = AutoSlugField(populate_from='title')
+    slug = AutoSlugField(populate_from='title', overwrite=True)
     description = models.TextField(blank=True)
     website = models.URLField(blank=True)
     copyright = models.CharField(max_length=255, blank=True)
