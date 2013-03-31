@@ -168,6 +168,8 @@ class TestPodcastChannelModel(TestCase):
                     <title>Episode 123</title>
                     <description>Another episode</description>
                     <author>jim@example.com (Jim Bob)</author>
+                    <link>http://example.com/ep123/</link>
+                    <image><url>http://example.com/feed.jpg</url></image>
                     <pubDate>Mon, 25 Feb 2013 07:10:42 -0000</pubDate>
                     <guid isPermaLink="false">/ep123.mp3</guid>
                     <enclosure url="http://example.com/ep123.mp3"
@@ -182,6 +184,9 @@ class TestPodcastChannelModel(TestCase):
         self.mock.StubOutWithMock(PodcastItem, 'download_file')
         self.mock.StubOutWithMock(model_logger, 'info')
         model_logger.info('Found 1 new items')
+        self.mock.StubOutWithMock(PodcastChannel, 'parse_cover_url')
+        PodcastChannel.parse_cover_url(mox.IsA(etree._Element)).AndReturn(
+            'http://example.com/feed.jpg')
 
         self.mock.ReplayAll()
         channel.update_items(tree)
@@ -193,10 +198,12 @@ class TestPodcastChannelModel(TestCase):
         self.assertEqual(item.title, 'Episode 123')
         self.assertEqual(item.description, 'Another episode')
         self.assertEqual(item.author, 'jim@example.com (Jim Bob)')
+        self.assertEqual(item.link, 'http://example.com/ep123/')
         self.assertEqual(item.publish_date,
                          datetime(2013, 2, 25, 7, 10, 42, tzinfo=timezone.utc))
         self.assertEqual(item.url, 'http://example.com/ep123.mp3')
         self.assertEqual(item.file_type, 'audio/mpeg')
+        self.assertEqual(item.cover_url, 'http://example.com/feed.jpg')
 
     def test_update_items_existing_item(self):
         feed_content = '''
@@ -342,6 +349,13 @@ class TestPodcastChannelModel(TestCase):
         self.assertEqual(channel.podcast_items.count(), 1)
         self.assertEqual(item.guid, '/ep123.mp3')
 
+    def test_has_unlistened(self):
+        channel = PodcastChannel.objects.create(url='http://example.com')
+        channel.podcast_items.create(guid='/ep123.mp3', title='Old title',
+                                     listened=True)
+
+        self.assertTrue(channel.has_unlistened)
+
 
 class PodcastItemModelTest(TestCase):
     def setUp(self):
@@ -352,11 +366,10 @@ class PodcastItemModelTest(TestCase):
 
     def test_unicode(self):
         channel = PodcastChannel(title='Fake Feed')
-        item = PodcastItem(channel=channel, title='Episode 123',
-                           publish_date='2013-02-25 07:10:45')
+        item = PodcastItem(channel=channel, title='Episode 123')
 
         self.assertEqual(
-            unicode(item), 'Fake Feed - Episode 123 - 2013-02-25 07:10:45')
+            unicode(item), 'Fake Feed - Episode 123')
 
     def test_download_file(self):
         self.mock.StubOutWithMock(requests, 'get')
