@@ -1,0 +1,36 @@
+{% extends "podcast_client/podcast_base.html" %}
+
+{% block breadcumbs %}
+    {{block.super}}
+    <li><span class="divider">&gt;</span> <a href="{% url "podcast_client:channel_list" %}">Channels</a></li>
+    <li class="active"><span class="divider">&gt;</span> {{object.title}}</li>
+{% endblock %}
+
+{% block sidebar %}
+<img src="{{object.cover_url|default:"blah"}}" alt="{{object.title}}" class="img-polaroid" />
+<div class="span12"><h3>{{object.title}}</h3></div>
+{% if object.website %}<div class="span12"><a href="{{object.website}}" target="_blank">Website <i class="icon-share"></i></a></div>{% endif %}
+{% if object.copyright %}<div class="span12"><h6>{{object.copyright}}</h6></div>{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if object.description %}{{object.description}}{% endif %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Title</th>
+            <th>Release Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in object.podcast_items.all %}
+        <tr>
+            <td>{%if item.listened %}<i class="icon-ok" title="Listened"></i>{% else %}<i class="icon-asterisk" title="New"></i>{% endif %}</td>
+            <td><i class="{% if item.media_type == "audio" %}icon-headphones{% elif item.media_type == "video" %}icon-film{% elif item.media_type == "none" %}icon-globe{% else %}icon-file{% endif %}"></i> <a href="{% url "podcast_client:item_detail" item.channel.slug item.id %}">{{item.title}}</a></td>
+            <td>{{item.publish_date}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
