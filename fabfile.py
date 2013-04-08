@@ -26,7 +26,7 @@ def shell():
 
 
 def test():
-    """Run the Waffle test suite."""
+    """Run the test suite."""
     _local('django-admin.py test')
 
 
