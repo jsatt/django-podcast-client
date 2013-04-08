@@ -1,0 +1,27 @@
+{% extends "podcast_client/podcast_base.html" %}
+
+{% block breadcumbs %}
+    {{block.super}}
+    <li><span class="divider">&gt;</span> <a href="{% url "podcast_client:channel_list" %}">Channels</a></li>
+    <li><span class="divider">&gt;</span> <a href="{% url "podcast_client:channel_detail" object.channel.slug%}">{{object.channel.title}}</a></li>
+    <li class="active"><span class="divider">&gt;</span> {{object.title}}</li>
+{% endblock %}
+
+{% block sidebar %}
+<img src="{{object.channel.cover_url|default:"blah"}}" alt="{{object.channel.title}}" class="img-polaroid" />
+<div class="span12"><h3>{{object.channel.title}}</h3></div>
+{% if object.channel.website %}<div class="span12"><a href="{{object.channel.website}}" target="_blank">Website <i class="icon-share"></i></a></div>{% endif %}
+{% if object.channel.copyright %}<div class="span12"><h6>{{object.channel.copyright}}</h6></div>{% endif %}
+
+{% endblock %}
+
+{% block content %}
+<h1>{{object.title}}</h1>
+{% if object.cover_url %}<img src="{{object.cover_url|default:"blah"}}" alt="{{object.title}}" class="img-polaroid" />{% endif %}
+{{object.description|safe}}
+{%if object.listened %}<i class="icon-ok" title="Listened"></i>{% else %}<i class="icon-asterisk" title="New"></i>{% endif %}
+{{object.author}}
+<a href="{{object.link}}" target="_blank">Link <i class="icon-share"></i></a>
+{{object.file_type}}
+{% endblock %}
+

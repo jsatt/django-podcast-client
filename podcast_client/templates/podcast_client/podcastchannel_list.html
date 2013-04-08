@@ -1,0 +1,27 @@
+{% extends "podcast_client/podcast_base.html" %}
+
+{% block breadcumbs %}
+    {{block.super}}
+    <li class="active"><span class="divider">&gt;</span> Channels</li>
+{% endblock %}
+
+{% block content %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>New</th>
+            <th>Title</th>
+            <th>Latest Podcast</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for channel in object_list %}
+        <tr>
+            <td>{%if channel.has_unlistened %}<i class="icon-asterisk"></i>{% endif %}</td>
+            <td><a href="{% url "podcast_client:channel_detail" channel.slug %}">{{channel.title}}</a></td>
+            <td>{{channel.podcast_items.latest.publish_date}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

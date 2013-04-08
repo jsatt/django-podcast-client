@@ -1,4 +1,3 @@
-from xml.dom import minidom
 from lxml import etree
 import logging
 
@@ -22,7 +21,7 @@ class PodcastChannel(TimeStampedModel):
     download_new = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return u'%s' % self.title or self.url
+        return u'%s' % (self.title or self.url)
 
     @classmethod
     def subscribe(cls, url):
@@ -73,6 +72,7 @@ class PodcastChannel(TimeStampedModel):
                 pod_item.description = getattr(
                     item.find('description'), 'text', '')
                 pod_item.author = getattr(item.find('author'), 'text', '')
+                pod_item.link = getattr(item.find('link'), 'text', '')
                 pub_date = getattr(item.find('pubDate'), 'text', '')
                 if pub_date:
                     pod_item.publish_date = dateutil.parser.parse(pub_date)
@@ -80,6 +80,7 @@ class PodcastChannel(TimeStampedModel):
                 if enclosure:
                     pod_item.url = enclosure.get('url', '')
                     pod_item.file_type = enclosure.get('type', '')
+                pod_item.cover_url = self.parse_cover_url(item)
                 pod_item.save()
                 new_items.append(pod_item)
         logger.info('Found %d new items' % len(new_items))
@@ -87,21 +88,37 @@ class PodcastChannel(TimeStampedModel):
             for item in new_items:
                 item.download_file()
 
+    def has_unlistened(self):
+        return self.podcast_items.filter(listened=False).exists()
+
 
 class PodcastItem(models.Model):
     guid = models.CharField(max_length=255, db_index=True)
     channel = models.ForeignKey(PodcastChannel, related_name='podcast_items')
     url = models.URLField()
     title = models.CharField(max_length=255, blank=True)
+    slug = AutoSlugField(populate_from=('channel', 'title'))
     description = models.TextField(blank=True)
     author = models.CharField(max_length=255, blank=True)
+    link = models.URLField(blank=True)
     publish_date = models.DateTimeField(blank=True, null=True)
     file_type = models.CharField(max_length=20, blank=True)
     file = models.FileField(upload_to='files', blank=True, null=True)
     listened = models.BooleanField(default=False)
+    cover_url = models.URLField(blank=True)
+
+    AUDIO_FORMATS = ('audio/mpeg', 'audio/mp4', 'audio/ogg', 'audio/vorbis',
+                     'audio/webm', 'audio/vnd.wave')
+    VIDEO_FORMATS = ('video/mpeg', 'video/mp4', 'video/ogg', 'video/webm',
+                     'video/quicktime', 'video/x-flv', 'video/x-ms-wmv',
+                     'video/x-m4v')
+
+    class Meta:
+        get_latest_by = 'publish_date'
+        ordering = ('-publish_date',)
 
     def __unicode__(self):
-        return '%s - %s - %s' % (self.channel, self.title, self.publish_date)
+        return u'%s - %s' % (self.channel, self.title)
 
     def download_file(self):
         logger.info('Downloading - %s' % self.title)
@@ -116,6 +133,18 @@ class PodcastItem(models.Model):
     def delete_file(self):
         if self.file:
             self.file.delete()
+
+    @property
+    def media_type(self):
+        if self.file_type in self.AUDIO_FORMATS:
+            media_type = 'audio'
+        elif self.file_type in self.VIDEO_FORMATS:
+            media_type = 'video'
+        elif self.file_type:
+            media_type = 'unknown'
+        else:
+            media_type = 'none'
+        return media_type
 
 
 def cleanup_item_delete(sender, instance=None, **kwargs):
