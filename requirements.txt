@@ -1,16 +1,18 @@
 pip>=0.8.2
 South
-Django
+Django=>1.5
 django-extensions
 python-dateutil
-psycopg2
 requests
 lxml
 
-mox
-nose
-django-nose
-
-#jinja2
+# optional/suggested
+#psycopg2
 #celery
 #django-celery
+
+# install these if you intend to develop
+#mox
+#nose
+#django-nose
+#fabric
