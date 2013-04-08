@@ -67,12 +67,12 @@ without a project.  I've borrowed a pattern used by
 Be sure to install Fabric using `pip install fabric`, and use `fab` to run your
 developement environment. Run `fab -l` to see all options.
 
-To running tests also requires nose and mox, run
-`pip install mox nose django-nose`. You can then run `fab test`.
+Running tests also requires nose and mox. Run
+`pip install mox nose django-nose` to install. You can then run `fab test`.
 
-To manually run the app and admin, you'll want to run `fab syncdb` then
-`fab migrate`, then you can run `fab serve` to start the Django dev server,
-or `fab shell` to open the Django shell.
+To manually run the app, you'll want to run `fab syncdb` then `fab migrate`,
+then you can run `fab serve` to start the Django dev server, or `fab shell` to
+open the Django shell.
 
 Please make sure any pull requests are PEP8 compliant and pass pyflakes. It's
 also preferable that an issue is opened and discussed before a pull request is
