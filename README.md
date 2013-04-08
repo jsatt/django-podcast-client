@@ -74,6 +74,6 @@ To manually run the app, you'll want to run `fab syncdb` then `fab migrate`,
 then you can run `fab serve` to start the Django dev server, or `fab shell` to
 open the Django shell.
 
-Please make sure any pull requests are PEP8 compliant and pass pyflakes. It's
-also preferable that an issue is opened and discussed before a pull request is
-merged.
+Please make sure any pull requests are PEP8 compliant, pass pyflakes, and have
+complete test coverage. It's also preferable that an issue is opened and
+discussed before a pull request is merged.
