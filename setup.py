@@ -27,7 +27,7 @@ setup(name='django-podcast-client',
           'Django>=1.5',
           'django-extensions',
           'python-dateutil',
-          'requests'
+          'requests',
           'lxml',],
       classifiers=[
           'Development Status :: 4 - Beta',
