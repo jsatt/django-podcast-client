@@ -15,8 +15,29 @@
 from setuptools import setup
 
 setup(name='django-podcast-client',
-      version='0.0.1',
+      version='0.0.2',
+      description='A client for downloading and organzing podcasts.',
+      long_description=open('README.md').read(),
       author='Jeremy Satterfield',
       author_email='jsatt22@gmail.com',
+      url='http://github.com/jsatt/django-podcast-client',
+      license='GNU General Public License v3 (GPLv3)',
       packages=['podcast_client'],
+      install_requires=[
+          'South',
+          'Django>=1.5',
+          'django-extensions',
+          'python-dateutil',
+          'requests'
+          'lxml',],
+      classifiers=[
+          'Development Status :: 4 - Beta',
+          'Environment :: Web Environment',
+          'Framework :: Django',
+          'Intended Audience :: End Users/Desktop',
+          'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+          'Natural Language :: English',
+          'Operating System :: OS Independent',
+          'Programming Language :: Python',
+          'Topic :: Utilities',],
      )
