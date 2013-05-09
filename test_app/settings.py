@@ -7,11 +7,12 @@ DATABASES = {
         'NAME': 'test.db',
     }
 }
-USE_TZ = True
+USE_TZ = False
 SITE_ID = 1
 SECRET_KEY = 'keepitsecretkeepitsafe'
 
 ROOT_URLCONF = 'test_app.urls'
+STATIC_URL = '/static/'
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -22,6 +23,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nose',
+    'south',
     'podcast_client',
 )
 
