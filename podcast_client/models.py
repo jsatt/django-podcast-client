@@ -1,6 +1,7 @@
 from lxml import etree
 import logging
 
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 from django_extensions.db.models import AutoSlugField, TimeStampedModel
@@ -9,6 +10,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+settings.PODCAST_DIRECTORY = getattr(settings, 'PODCAST_DIRECTORY', 'podcasts')
 
 class PodcastChannel(TimeStampedModel):
     url = models.URLField(unique=True)
@@ -35,10 +37,13 @@ class PodcastChannel(TimeStampedModel):
         if req.ok:
             tree = etree.fromstring(req.content)
             channel = tree.find('channel')
-            self.title = getattr(channel.find('title'), 'text', '')
-            self.description = getattr(channel.find('description'), 'text', '')
-            self.website = getattr(channel.find('link'), 'text', '')
-            self.copyright = getattr(channel.find('copyright'), 'text', '')
+            self.title = getattr(channel.find('title'), 'text', None) or ''
+            self.description = getattr(
+                channel.find('description'), 'text', None) or ''
+            self.website = getattr(
+                channel.find('link'), 'text', None or '')
+            self.copyright = getattr(
+                channel.find('copyright'), 'text', None) or ''
             self.cover_url = self.parse_cover_url(channel)
             self.save()
             self.update_items(channel, download=download)
@@ -47,7 +52,8 @@ class PodcastChannel(TimeStampedModel):
 
 
     def parse_cover_url(self, tree):
-        image_url = getattr(tree.find('image/url'), 'text', '')
+        image_url = getattr(
+            tree.find('image/url'), 'text', None) or ''
 
         if not image_url and 'media' in tree.nsmap:
             image_url = getattr(
@@ -65,18 +71,21 @@ class PodcastChannel(TimeStampedModel):
     def update_items(self, channel, download=False):
         new_items = []
         for item in channel.findall('item'):
-            guid = getattr(item.find('guid'), 'text', '')
+            guid = getattr(item.find('guid'), 'text', None) or ''
             pod_item, created = self.podcast_items.get_or_create(guid=guid)
             if created:
-                pod_item.title = getattr(item.find('title'), 'text', '')
+                pod_item.title = getattr(
+                    item.find('title'), 'text', None) or ''
                 pod_item.description = getattr(
-                    item.find('description'), 'text', '')
-                pod_item.author = getattr(item.find('author'), 'text', '')
-                pod_item.link = getattr(item.find('link'), 'text', '')
-                pub_date = getattr(item.find('pubDate'), 'text', '')
+                    item.find('description'), 'text', None) or ''
+                pod_item.author = getattr(
+                    item.find('author'), 'text', None)or ''
+                pod_item.link = getattr(item.find('link'), 'text', None) or ''
+                pub_date = getattr(item.find('pubDate'), 'text', None) or ''
                 if pub_date:
                     pod_item.publish_date = dateutil.parser.parse(pub_date)
-                enclosure = getattr(item.find('enclosure'), 'attrib', '')
+                enclosure = getattr(
+                    item.find('enclosure'), 'attrib', None) or ''
                 if enclosure:
                     pod_item.url = enclosure.get('url', '')
                     pod_item.file_type = enclosure.get('type', '')
@@ -103,7 +112,8 @@ class PodcastItem(models.Model):
     link = models.URLField(blank=True)
     publish_date = models.DateTimeField(blank=True, null=True)
     file_type = models.CharField(max_length=20, blank=True)
-    file = models.FileField(upload_to='files', blank=True, null=True)
+    file = models.FileField(upload_to=settings.PODCAST_DIRECTORY, blank=True,
+                            null=True)
     listened = models.BooleanField(default=False)
     cover_url = models.URLField(blank=True)
 
