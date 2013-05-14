@@ -49,3 +49,6 @@ def migrate():
     """Update a testing database with south."""
     _local('django-admin.py migrate')
 
+
+def podcast(cmd):
+    _local('django-admin.py podcast %s' % cmd)
