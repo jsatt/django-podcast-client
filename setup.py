@@ -21,7 +21,9 @@ setup(name='django-podcast-client',
       author_email='jsatt22@gmail.com',
       url='http://github.com/jsatt/django-podcast-client',
       license='GNU General Public License v3 (GPLv3)',
-      packages=['podcast_client'],
+      packages=[
+          'podcast_client', 'podcast_client.management',
+          'podcast_client.management.commands', 'podcast_client.migrations'],
       install_requires=[
           'South',
           'Django>=1.5',
