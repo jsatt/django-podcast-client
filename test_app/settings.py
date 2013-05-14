@@ -7,7 +7,7 @@ DATABASES = {
         'NAME': 'test.db',
     }
 }
-USE_TZ = False
+USE_TZ = True
 SITE_ID = 1
 SECRET_KEY = 'keepitsecretkeepitsafe'
 
