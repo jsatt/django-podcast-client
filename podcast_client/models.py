@@ -2,7 +2,7 @@ from lxml import etree
 import logging
 
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.db import models
 from django_extensions.db.models import AutoSlugField, TimeStampedModel
 import dateutil.parser
@@ -134,7 +134,7 @@ class PodcastItem(models.Model):
         logger.info('Downloading - %s' % self.title)
         req = requests.get(self.url)
         if req.ok:
-            file = SimpleUploadedFile(
+            file = TemporaryUploadedFile(
                 self.url, req.content, req.headers['content-type'])
             self.file.save(self.url, file)
         else:
