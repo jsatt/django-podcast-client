@@ -135,7 +135,8 @@ class PodcastItem(models.Model):
         req = requests.get(self.url, stream=True)
         if req.ok:
             # some downloads are tooo big to keep in memory
-            filename = req.request.path_url.split('/')[-1]
+            filename = req.request.path_url.split(
+                '/')[-1].split('?')[0].split('#')[0]
             file_path = '%s/%s' % (settings.PODCAST_DIRECTORY, filename)
             path = '%s/%s' % (settings.MEDIA_ROOT, file_path)
             with open(path, 'wb') as f:
