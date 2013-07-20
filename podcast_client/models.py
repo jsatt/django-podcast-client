@@ -132,11 +132,19 @@ class PodcastItem(models.Model):
 
     def download_file(self):
         logger.info('Downloading - %s' % self.title)
-        req = requests.get(self.url)
+        req = requests.get(self.url, stream=True)
         if req.ok:
-            file = TemporaryUploadedFile(
-                self.url, req.content, req.headers['content-type'])
-            self.file.save(self.url, file)
+            # some downloads are tooo big to keep in memory
+            filename = req.request.path_url.split('/')[-1]
+            file_path = '%s/%s' % (settings.PODCAST_DIRECTORY, filename)
+            path = '%s/%s' % (settings.MEDIA_ROOT, file_path)
+            with open(path, 'wb') as f:
+                for block in req.iter_content(1024):
+                    if not block:
+                        break
+                    f.write(block)
+            self.file = file_path
+            self.save()
         else:
             logger.error('Failed to retrieve file. Status %s' % req.reason)
 
