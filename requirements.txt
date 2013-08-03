@@ -5,6 +5,7 @@ django-extensions
 python-dateutil
 requests
 lxml
+djangorestframework
 
 # optional/suggested
 #psycopg2

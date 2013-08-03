@@ -23,6 +23,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_nose',
+    'rest_framework',
     'south',
     'podcast_client',
 )
