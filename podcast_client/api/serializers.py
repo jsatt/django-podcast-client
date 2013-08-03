@@ -26,7 +26,7 @@ class PodcastItemSerializer(serializers.ModelSerializer):
 
 
 class PodcastChannelDetailSerializer(serializers.HyperlinkedModelSerializer):
-    items = PodcastItemSerializer(source='podcast_items')
+    items = PodcastItemSerializer(source='podcast_items', read_only=True)
 
     class Meta:
         model = PodcastChannel
@@ -38,7 +38,7 @@ class PodcastChannelDetailSerializer(serializers.HyperlinkedModelSerializer):
 
 class PodcastItemDetailSerializer(serializers.ModelSerializer):
     media_type = serializers.Field(source='media_type')
-    channel = PodcastChannelSerializer()
+    channel = PodcastChannelSerializer(read_only=True)
 
     class Meta:
         model = PodcastItem
