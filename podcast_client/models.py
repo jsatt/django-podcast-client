@@ -2,7 +2,6 @@ from lxml import etree
 import logging
 
 from django.conf import settings
-from django.core.files.uploadedfile import TemporaryUploadedFile
 from django.db import models
 from django_extensions.db.models import AutoSlugField, TimeStampedModel
 import dateutil.parser
@@ -11,6 +10,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 settings.PODCAST_DIRECTORY = getattr(settings, 'PODCAST_DIRECTORY', 'podcasts')
+
 
 class PodcastChannel(TimeStampedModel):
     url = models.URLField(unique=True)
@@ -50,7 +50,6 @@ class PodcastChannel(TimeStampedModel):
         else:
             logger.error('Failed to retrieve feed. Status %s' % req.reason)
 
-
     def parse_cover_url(self, tree):
         image_url = getattr(
             tree.find('image/url'), 'text', None) or ''
@@ -66,7 +65,6 @@ class PodcastChannel(TimeStampedModel):
                 'attrib', {}).get('href', '')
 
         return image_url
-
 
     def update_items(self, channel, download=False):
         new_items = []
@@ -106,7 +104,7 @@ class PodcastItem(models.Model):
     channel = models.ForeignKey(PodcastChannel, related_name='podcast_items')
     url = models.URLField()
     title = models.CharField(max_length=255, blank=True)
-    slug = AutoSlugField(populate_from=('channel', 'title'))
+    slug = AutoSlugField(populate_from=('channel', 'title'), overwrite=True)
     description = models.TextField(blank=True)
     author = models.CharField(max_length=255, blank=True)
     link = models.URLField(blank=True)
