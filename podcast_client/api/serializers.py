@@ -6,11 +6,18 @@ from podcast_client.models import PodcastChannel, PodcastItem
 class PodcastChannelSerializer(serializers.HyperlinkedModelSerializer):
     api_url = serializers.HyperlinkedIdentityField(
         view_name='podcast_client:api_channel_details', lookup_field='slug')
+    has_unlistened = serializers.Field(source='has_unlistened')
+    latest_publish_date = serializers.SerializerMethodField(
+        'get_latest_publish_date')
 
     class Meta:
         model = PodcastChannel
-        fields = ('url', 'api_url', 'title', 'slug')
+        fields = ('url', 'api_url', 'title', 'slug', 'has_unlistened',
+                  'latest_publish_date', 'cover_url')
         read_only_fields = ('title', 'slug')
+
+    def get_latest_publish_date(self, obj):
+        return obj.podcast_items.latest().publish_date
 
 
 class PodcastItemSerializer(serializers.ModelSerializer):

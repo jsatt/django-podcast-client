@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="pcApp">
+<head>
+    <meta charset="UTF-8">
+    <title ng-bind-template="[[page_title]] - Django Podcast Client">Django Podcast Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" media="all" href="{{STATIC_URL}}css/podcast_client.css" />
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row" ui-view>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="base.html">
+        <div class="col-sm-3 col-lg-2">
+            <div id="sidebar" ui-view="sidebar"></div>
+        </div>
+        <div class="col-sm-9 col-lg-10">
+            <back-btn></back-btn>
+            <div id="content" ui-view="content"></div>
+        </div>
+    </script>
+    <script type="text/ng-template" id="channel-list.html">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>New</th>
+                    <th>Title</th>
+                    <th>Latest Podcast</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="channel in channels">
+                    <td><i class="glyphicon glyphicon-asterisk" ng-if="channel.has_unlistened"></i></td>
+                    <td><a ui-sref="podcast-client.channel({slug: channel.slug})">[[channel.title]]</a></td>
+                    <td>[[channel.latest_publish_date|date:'longDate']]</td>
+                </tr>
+            </tbody>
+        </table>
+    </script>
+    <script type="text/ng-template" id="channel-details.html">
+        <div class="lead" ng-if="channel.description">[[channel.description]]</div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>&nbsp;</th>
+                    <th>Title</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in channel.items">
+                    <td>
+                        <listened></listened>
+                        <media-type></media-type>
+                    </td>
+                    <td><a ui-sref="podcast-client.item({slug: item.slug})">[[item.title]]</a></td>
+                    <td>[[item.publish_date|date:'longDate']]</td>
+                </tr>
+            </tbody>
+        </table>
+    </script>
+    <script type="text/ng-template" id="channel-details-sidebar.html">
+        <img ng-if="channel.cover_url" ng-src="[[channel.cover_url]]" class="cover" />
+        <h3>[[channel.title]]</h3>
+        <p><download-indicator></download-indicator>
+        <p ng-if="channel.website"><external-link url="channel.website">Website</external-link></p>
+        <small ng-if="channel.copyright">[[channel.copyright]]</small>
+    </script>
+    <script type="text/ng-template" id="item-details.html">
+        <div>
+            <span ng-if="item.publish_date">[[item.publish_date|date:"longDate"]]:</span>
+            <span ng-if="item.author">[[item.author]]</span>
+        </div>
+        <div>Listened: <listened></listened></div>
+        <p ng-if="item.link"><external-link url="item.link">Website</external-link></p>
+        <p>[[item.description]]</p>
+    </script>
+    <script type="text/ng-template" id="item-details-sidebar.html">
+        <img ng-if="item.cover_url" ng-src="[[item.cover_url]]" class="cover" />
+        <img ng-if="!item.cover_url && item.channel.cover_url" ng-src="[[item.channel.cover_url]]" class="cover" />
+        <h3>[[item.title]]</h3>
+    </script>
+    <script src="{{STATIC_URL}}js/podcast_client.js"></script>
+</body>
+</html>

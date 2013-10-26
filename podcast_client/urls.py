@@ -1,4 +1,5 @@
 from django.conf.urls import include, patterns, url
+from django.views.generic import TemplateView
 
 from . import views
 
@@ -14,11 +15,7 @@ api_patterns = patterns(
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.ChannelList.as_view(), name='home'),
     url(r'^api/', include(api_patterns)),
-    url(r'^channels/$', views.ChannelList.as_view(), name='channel_list'),
-    url(r'^channels/(?P<slug>[a-zA-Z\d\-]+)/$', views.ChannelDetail.as_view(),
-        name='channel_detail'),
-    url(r'^channels/(?P<channel_slug>[a-zA-Z\d\-]+)/(?P<pk>\d+)/$',
-        views.ItemDetail.as_view(), name='item_detail'),
+    url(r'^', TemplateView.as_view(template_name='podcast_client/home.html'),
+        name='home'),
 )
