@@ -11,3 +11,4 @@ dist
 /manage.py
 .coverage
 /test_env/
+test.db
