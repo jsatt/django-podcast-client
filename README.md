@@ -4,6 +4,9 @@ Django Podcast Client implements a simple podcasting client that can be used
 from both the command line and your browser. If you choose to only use as a
 command line tool, there is no need to run a Django instance as a service.
 
+[![Build Status](https://travis-ci.org/jsatt/django-podcast-client.png?branch=master)](https://travis-ci.org/jsatt/django-podcast-client)
+[![Coverage Status](https://coveralls.io/repos/jsatt/django-podcast-client/badge.png)](https://coveralls.io/r/jsatt/django-podcast-client)
+
 Setup
 -----
 Install using pip:
