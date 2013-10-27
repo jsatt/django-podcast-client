@@ -13,7 +13,7 @@ djangorestframework
 #django-celery
 
 # install these if you intend to develop
-#mox
-#nose
-#django-nose
-#fabric
+mox
+nose
+django-nose
+fabric
