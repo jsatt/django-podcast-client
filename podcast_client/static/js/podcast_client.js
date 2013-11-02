@@ -262,13 +262,26 @@ window.angular);
     return {
       restrict: 'E',
       replace: true,
-      template: '<span ng-switch="item.listened">\n    <i class="glyphicon glyphicon-star" ng-switch-when="true" title="Listened"></i>\n    <i class="glyphicon glyphicon-star-empty" ng-switch-when="false" title="Not Listened"></i>\n</span>'
+      controller: [
+        '$scope', 'Item', function($scope, Item) {
+          return $scope.toggle_listen = function(listened) {
+            return Item.update({
+              slug: $scope.item.slug
+            }, {
+              listened: listened
+            }, function(resp) {
+              return $scope.item = resp;
+            });
+          };
+        }
+      ],
+      template: '<span ng-switch="item.listened" class="listened">\n    <i class="glyphicon glyphicon-ok yes" ng-switch-when="true" ng-click="toggle_listen(false)" title="Mark as New"></i>\n    <i class="glyphicon glyphicon-star no" ng-switch-when="false" ng-click="toggle_listen(true)" title="Mark as Listened"></i>\n</span>'
     };
   }).directive('mediaType', function() {
     return {
       restrict: 'E',
       replace: true,
-      template: '<span ng-switch="item.media_type">\n    <i class="glyphicon glyphicon-film" ng-switch-when="video" title="Video"></i>\n    <i class="glyphicon glyphicon-headphones" ng-switch-when="audio" title="Audio"></i>\n    <i class="glyphicon glyphicon-file" ng-switch-when="unknown" title="Unknown Media Type"></i>\n</span>'
+      template: '<span ng-switch="item.media_type" class="media_type">\n    <i class="glyphicon glyphicon-film video" ng-switch-when="video" title="Video"></i>\n    <i class="glyphicon glyphicon-headphones audio" ng-switch-when="audio" title="Audio"></i>\n    <i class="glyphicon glyphicon-file unknown" ng-switch-when="unknown" title="Unknown Media Type"></i>\n</span>'
     };
   }).directive('externalLink', function() {
     return {
@@ -280,11 +293,30 @@ window.angular);
       transclude: true,
       template: '<a ng-href="[[url]]" target="blank" class="external-link"><span ng-transclude></span> <i class="glyphicon glyphicon-new-window" title="External Link"></i></a>'
     };
-  }).directive('downloadIndicator', function() {
+  }).directive('downloadNewIndicator', function() {
     return {
       restrict: 'E',
       replace: true,
-      template: '<span ng-switch="channel.download_new">\n    Download New:\n    <i class="glyphicon glyphicon-check" ng-switch-when="true" title="Download"></i>\n    <i class="glyphicon glyphicon-unchecked" ng-switch-when="false" title="Do Not Download"></i>\n</span>'
+      controller: [
+        '$scope', 'Channel', function($scope, Channel) {
+          return $scope.toggle_download = function(dl) {
+            return Channel.update({
+              slug: $scope.channel.slug
+            }, {
+              download_new: dl
+            }, function(resp) {
+              return $scope.channel = resp;
+            });
+          };
+        }
+      ],
+      template: '<span ng-switch="channel.download_new" class="download_new">\n    Download New:\n    <i class="glyphicon glyphicon-check" ng-switch-when="true" ng-click="toggle_download(false)" title="Download"></i>\n    <i class="glyphicon glyphicon-unchecked" ng-switch-when="false" ng-click="toggle_download(true)" title="Do Not Download"></i>\n</span>'
+    };
+  }).directive('downloadedFile', function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      template: '<span ng-switch="item.file_downloaded" class="downloaded_file">\n    <i class="glyphicon glyphicon-saved" ng-switch-when="true" title="Delete from Server"></i>\n    <i class="glyphicon glyphicon-save" ng-switch-when="false" title="Retrieve to Server"></i>\n</span>'
     };
   });
 
@@ -408,11 +440,23 @@ window.angular);
 (function() {
   angular.module('podcastClient.services', ['ngResource']).factory('Channel', [
     '$resource', function($resource) {
-      return $resource('/podcasts/api/channels/:slug');
+      return $resource('/podcasts/api/channels/:slug', {
+        slug: '@slug'
+      }, {
+        update: {
+          method: 'PATCH'
+        }
+      });
     }
   ]).factory('Item', [
     '$resource', function($resource) {
-      return $resource('/podcasts/api/items/:slug');
+      return $resource('/podcasts/api/items/:slug', {
+        slug: '@slug'
+      }, {
+        update: {
+          method: 'PATCH'
+        }
+      });
     }
   ]);
 

@@ -24,12 +24,17 @@ class PodcastItemSerializer(serializers.ModelSerializer):
     media_type = serializers.Field(source='media_type')
     api_url = serializers.HyperlinkedIdentityField(
         view_name='podcast_client:api_item_details', lookup_field='slug')
+    file_downloaded = serializers.SerializerMethodField(
+        'is_file_downloaded')
 
     class Meta:
         model = PodcastItem
         fields = ('url', 'api_url', 'title', 'slug', 'publish_date',
-                  'media_type', 'listened')
+                  'media_type', 'listened', 'file_downloaded')
         read_only_fields = ('url', 'title', 'slug', 'publish_date')
+
+    def is_file_downloaded(self, obj):
+        return bool(obj.file)
 
 
 class PodcastChannelDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -46,12 +51,18 @@ class PodcastChannelDetailSerializer(serializers.HyperlinkedModelSerializer):
 class PodcastItemDetailSerializer(serializers.ModelSerializer):
     media_type = serializers.Field(source='media_type')
     channel = PodcastChannelSerializer(read_only=True)
+    file_downloaded = serializers.SerializerMethodField(
+        'is_file_downloaded')
 
     class Meta:
         model = PodcastItem
         fields = (
             'channel', 'url', 'title', 'slug', 'description', 'author', 'link',
-            'publish_date', 'media_type', 'listened', 'cover_url')
+            'publish_date', 'media_type', 'listened', 'cover_url',
+            'file_downloaded')
         read_only_fields = (
             'url', 'title', 'slug', 'description', 'author', 'link',
             'publish_date', 'cover_url')
+
+    def is_file_downloaded(self, obj):
+        return bool(obj.file)
