@@ -13,3 +13,4 @@ dist
 /test_env/
 test.db
 /media/node_modules/
+/media/tmp/
