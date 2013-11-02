@@ -1,8 +1,10 @@
 pcApp = angular.module('pcApp', ['ui.router', 'podcastClient.directives', 'podcastClient.services'])
 
-pcApp.config ['$stateProvider', '$locationProvider', '$interpolateProvider', '$urlRouterProvider', ($stateProvider, $locationProvider, $interpolateProvider, $urlRouterProvider) ->
+pcApp.config ['$stateProvider', '$locationProvider', '$interpolateProvider', '$urlRouterProvider', '$httpProvider', ($stateProvider, $locationProvider, $interpolateProvider, $urlRouterProvider) ->
     $interpolateProvider.startSymbol('[[')
     $interpolateProvider.endSymbol(']]')
+    $httpProvider.defaults.xsrfCookieName = "csrftoken"
+    $httpProvider.defaults.xsrfHeaderName = "X-CSRFToken"
 
     getTemplate = (name) ->
         return ->
