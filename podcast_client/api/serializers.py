@@ -39,27 +39,38 @@ class PodcastItemSerializer(serializers.ModelSerializer):
 
 class PodcastChannelDetailSerializer(serializers.HyperlinkedModelSerializer):
     items = PodcastItemSerializer(source='podcast_items', read_only=True)
+    api_url = serializers.HyperlinkedIdentityField(
+        view_name='podcast_client:api_channel_details', lookup_field='slug')
+    has_unlistened = serializers.Field(source='has_unlistened')
+    latest_publish_date = serializers.SerializerMethodField(
+        'get_latest_publish_date')
 
     class Meta:
         model = PodcastChannel
-        fields = ('url', 'title', 'slug', 'description', 'website',
-                  'copyright', 'cover_url', 'download_new', 'items')
+        fields = ('url', 'api_url', 'title', 'slug', 'description', 'website',
+                  'copyright', 'cover_url', 'download_new', 'items',
+                  'has_unlistened')
         read_only_fields = ('title', 'slug', 'description', 'website',
                             'copyright', 'cover_url')
+
+    def get_latest_publish_date(self, obj):
+        return obj.podcast_items.latest().publish_date
 
 
 class PodcastItemDetailSerializer(serializers.ModelSerializer):
     media_type = serializers.Field(source='media_type')
     channel = PodcastChannelSerializer(read_only=True)
+    api_url = serializers.HyperlinkedIdentityField(
+        view_name='podcast_client:api_item_details', lookup_field='slug')
     file_downloaded = serializers.SerializerMethodField(
         'is_file_downloaded')
 
     class Meta:
         model = PodcastItem
         fields = (
-            'channel', 'url', 'title', 'slug', 'description', 'author', 'link',
-            'publish_date', 'media_type', 'listened', 'cover_url',
-            'file_downloaded')
+            'channel', 'url', 'api_url', 'title', 'slug', 'description',
+            'author', 'link', 'publish_date', 'media_type', 'listened',
+            'cover_url', 'file_downloaded')
         read_only_fields = (
             'url', 'title', 'slug', 'description', 'author', 'link',
             'publish_date', 'cover_url')

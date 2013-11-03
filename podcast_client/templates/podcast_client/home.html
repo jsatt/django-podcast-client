@@ -31,13 +31,14 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="channel in channels">
+                <tr ng-repeat="channel in channels.results">
                     <td><i class="glyphicon glyphicon-asterisk" ng-if="channel.has_unlistened"></i></td>
                     <td><a ui-sref="podcast-client.channel({slug: channel.slug})">[[channel.title]]</a></td>
                     <td>[[channel.latest_publish_date|date:'longDate']]</td>
                 </tr>
             </tbody>
         </table>
+        <pagination></pagination>
     </script>
     <script type="text/ng-template" id="channel-details.html">
         <div class="lead" ng-if="channel.description">[[channel.description]]</div>
@@ -50,7 +51,7 @@
                 </tr>
             </thead-->
             <tbody>
-                <tr ng-repeat="item in channel.items">
+                <tr ng-repeat="item in items.results">
                     <td>
                         <listened></listened>
                         <media-type></media-type>
@@ -63,6 +64,7 @@
                 </tr>
             </tbody>
         </table>
+        <pagination></pagination>
     </script>
     <script type="text/ng-template" id="channel-details-sidebar.html">
         <img ng-if="channel.cover_url" ng-src="[[channel.cover_url]]" class="cover" />

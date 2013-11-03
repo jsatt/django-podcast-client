@@ -318,6 +318,12 @@ window.angular);
       replace: true,
       template: '<span ng-switch="item.file_downloaded" class="downloaded_file">\n    <i class="glyphicon glyphicon-saved" ng-switch-when="true" title="Delete from Server"></i>\n    <i class="glyphicon glyphicon-save" ng-switch-when="false" title="Retrieve to Server"></i>\n</span>'
     };
+  }).directive('pagination', function() {
+    return {
+      restrict: 'E',
+      replace: true,
+      template: '<ul class="pagination" ng-if="pages.length > 1">\n    <li ng-if="current_page > 1"><a ui-sref="podcast-client.channel({slug: channel.slug, page: current_page - 1})">&laquo;</a></li>\n    <li ng-repeat="page in pages" ng-class="{active: page == current_page || (page == 1 && !current_page)}"><a ui-sref="podcast-client.channel({slug: channel.slug, page: page})">[[page]]</a></li>\n    <li ng-if="current_page < pages.length"><a ui-sref="podcast-client.channel({slug: channel.slug, page: current_page + 1})">&raquo;</a></li>\n</ul>'
+    };
   });
 
 }).call(this);
@@ -328,10 +334,12 @@ window.angular);
   pcApp = angular.module('pcApp', ['ui.router', 'podcastClient.directives', 'podcastClient.services']);
 
   pcApp.config([
-    '$stateProvider', '$locationProvider', '$interpolateProvider', '$urlRouterProvider', function($stateProvider, $locationProvider, $interpolateProvider, $urlRouterProvider) {
+    '$stateProvider', '$locationProvider', '$interpolateProvider', '$urlRouterProvider', '$httpProvider', function($stateProvider, $locationProvider, $interpolateProvider, $urlRouterProvider, $httpProvider) {
       var getTemplate;
       $interpolateProvider.startSymbol('[[');
       $interpolateProvider.endSymbol(']]');
+      $httpProvider.defaults.xsrfCookieName = "csrftoken";
+      $httpProvider.defaults.xsrfHeaderName = "X-CSRFToken";
       getTemplate = function(name) {
         return function() {
           return document.getElementById(name).innerHTML;
@@ -343,31 +351,54 @@ window.angular);
         abstract: true,
         templateProvider: getTemplate('base.html')
       }).state('podcast-client.channels', {
-        url: '',
+        url: '?page',
         views: {
           content: {
             templateProvider: getTemplate('channel-list.html'),
             resolve: {
               channels: [
                 'Channel', function(Channel) {
-                  return Channel.query();
+                  return Channel.get();
                 }
               ]
             },
             controller: [
               '$scope', 'channels', function($scope, channels) {
-                return $scope.channels = channels;
+                $scope.channels = channels;
+                $scope.pages = [];
+                $scope.current_page = $scope.$stateParams.page ? parseInt($scope.$stateParams.page) : 1;
+                return $scope.$watch('channels.results', function() {
+                  var item_count, page_count, total_channels, _i, _results;
+                  if ($scope.channels.results) {
+                    total_channels = $scope.channels.count;
+                    item_count = $scope.channels.results.length;
+                    page_count = Math.ceil(total_channels / item_count);
+                    return $scope.pages = (function() {
+                      _results = [];
+                      for (var _i = 1; 1 <= page_count ? _i <= page_count : _i >= page_count; 1 <= page_count ? _i++ : _i--){ _results.push(_i); }
+                      return _results;
+                    }).apply(this);
+                  }
+                });
               }
             ]
           }
         }
       }).state('podcast-client.channel', {
-        url: ':slug',
+        url: ':slug?page',
         resolve: {
           channel: [
             '$stateParams', 'Channel', function($stateParams, Channel) {
               return Channel.get({
                 slug: $stateParams.slug
+              });
+            }
+          ],
+          items: [
+            '$stateParams', 'Items', function($stateParams, Items) {
+              return Items.get({
+                slug: $stateParams.slug,
+                page: $stateParams.page
               });
             }
           ]
@@ -376,8 +407,24 @@ window.angular);
           content: {
             templateProvider: getTemplate('channel-details.html'),
             controller: [
-              '$scope', 'channel', function($scope, channel) {
-                return $scope.channel = channel;
+              '$scope', 'channel', 'items', function($scope, channel, items) {
+                $scope.items = items;
+                $scope.channel = channel;
+                $scope.pages = [];
+                $scope.current_page = $scope.$stateParams.page ? parseInt($scope.$stateParams.page) : 1;
+                return $scope.$watch('items.results', function() {
+                  var item_count, page_count, total_items, _i, _results;
+                  if ($scope.items.results) {
+                    total_items = $scope.items.count;
+                    item_count = $scope.items.results.length;
+                    page_count = Math.ceil(total_items / item_count);
+                    return $scope.pages = (function() {
+                      _results = [];
+                      for (var _i = 1; 1 <= page_count ? _i <= page_count : _i >= page_count; 1 <= page_count ? _i++ : _i--){ _results.push(_i); }
+                      return _results;
+                    }).apply(this);
+                  }
+                });
               }
             ]
           },
@@ -446,6 +493,12 @@ window.angular);
         update: {
           method: 'PATCH'
         }
+      });
+    }
+  ]).factory('Items', [
+    '$resource', function($resource) {
+      return $resource('/podcasts/api/channels/:slug/items', {
+        slug: '@slug'
       });
     }
   ]).factory('Item', [
