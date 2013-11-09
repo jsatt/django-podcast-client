@@ -34,7 +34,7 @@ class PodcastItemSerializer(serializers.ModelSerializer):
         read_only_fields = ('url', 'title', 'slug', 'publish_date')
 
     def is_file_downloaded(self, obj):
-        return bool(obj.file)
+        return bool(obj and obj.file)
 
 
 class PodcastChannelDetailSerializer(serializers.HyperlinkedModelSerializer):
@@ -76,4 +76,4 @@ class PodcastItemDetailSerializer(serializers.ModelSerializer):
             'publish_date', 'cover_url')
 
     def is_file_downloaded(self, obj):
-        return bool(obj.file)
+        return bool(obj and obj.file)
