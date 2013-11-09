@@ -27,3 +27,7 @@ class ItemListAPI(ListCreateAPIView):
     model = PodcastItem
     serializer_class = PodcastItemDetailSerializer
     paginate_by = 10
+
+    def get_queryset(self):
+        qs = super(ItemListAPI, self).get_queryset()
+        return qs.filter(channel__slug=self.kwargs['slug'])
