@@ -38,6 +38,8 @@ pcApp.config ['$stateProvider', '$locationProvider', '$interpolateProvider', '$u
                             item_count = $scope.channels.results.length
                             page_count = Math.ceil(total_channels / item_count)
                             $scope.pages = [1..page_count]
+                    $scope.$on '$stateChangeStart', (event, toState, toParams, fromState, fromParams) ->
+                        toParams.parentStateParams = fromParams
                 ]
     .state 'podcast-client.channel',
         url: ':slug?page'
@@ -63,6 +65,9 @@ pcApp.config ['$stateProvider', '$locationProvider', '$interpolateProvider', '$u
                             item_count = $scope.items.results.length
                             page_count = Math.ceil(total_items / item_count)
                             $scope.pages = [1..page_count]
+                    $scope.$on '$stateChangeStart', (event, toState, toParams, fromState, fromParams) ->
+                        toParams.parentStateParams = fromParams
+
                 ]
             sidebar:
                 templateProvider: getTemplate('channel-details-sidebar.html')

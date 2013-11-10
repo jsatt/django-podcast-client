@@ -1,14 +1,5 @@
 angular.module('podcastClient.directives', [])
 
-.directive 'backBtn', ->
-    restrict: 'E'
-    replace: true
-    controller: ['$scope', ($scope) ->
-        $scope.go_back = ->
-            history.back()
-    ]
-    template: '''<div ng-if="$state.current.name != 'podcast-client.channels'" ><a ng-click="go_back()"><i class="glyphicon glyphicon-chevron-left"></i>Back</a></div>'''
-
 .directive 'listened', ->
     restrict: 'E'
     replace: true

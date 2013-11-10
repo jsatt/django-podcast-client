@@ -17,7 +17,6 @@
             <div id="sidebar" ui-view="sidebar"></div>
         </div>
         <div class="col-sm-8 col-lg-9">
-            <back-btn></back-btn>
             <div id="content" ui-view="content"></div>
         </div>
     </script>
@@ -33,7 +32,7 @@
             <tbody>
                 <tr ng-repeat="channel in channels.results">
                     <td><i class="glyphicon glyphicon-asterisk" ng-if="channel.has_unlistened"></i></td>
-                    <td><a ui-sref="podcast-client.channel({slug: channel.slug})">[[channel.title]]</a></td>
+                    <td><a ui-sref="podcast-client.channel({slug: channel.slug, page: null})">[[channel.title]]</a></td>
                     <td>[[channel.latest_publish_date|date:'longDate']]</td>
                 </tr>
             </tbody>
@@ -41,6 +40,7 @@
         <pagination></pagination>
     </script>
     <script type="text/ng-template" id="channel-details.html">
+        <div><a href="#" ui-sref="podcast-client.channels({page: $stateParams.parentStateParams.page})"><i class="glyphicon glyphicon-chevron-left"></i>Back</a></div>
         <div class="lead" ng-if="channel.description">[[channel.description]]</div>
         <table class="table table-striped table-hover">
             <!--thead>
@@ -74,6 +74,7 @@
         <small ng-if="channel.copyright">[[channel.copyright]]</small>
     </script>
     <script type="text/ng-template" id="item-details.html">
+        <div><a href="#" ui-sref="podcast-client.channel({slug: $stateParams.parentStateParams.slug, page: $stateParams.parentStateParams.page})"><i class="glyphicon glyphicon-chevron-left"></i>Back</a></div>
         <div>
             <span ng-if="item.publish_date">[[item.publish_date|date:"longDate"]]:</span>
             <span ng-if="item.author">[[item.author]]</span>
