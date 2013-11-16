@@ -346,7 +346,7 @@ class PodcastChannelModelTest(TestCase):
         channel.podcast_items.create(guid='/ep123.mp3', title='Old title',
                                      listened=True)
 
-        self.assertTrue(channel.has_unlistened)
+        self.assertFalse(channel.has_unlistened())
 
 
 class PodcastItemModelTest(TestCase):
@@ -433,3 +433,20 @@ class PodcastItemModelTest(TestCase):
         self.mock.ReplayAll()
         item.delete()
         self.mock.VerifyAll()
+
+    def test_media_type_audio(self):
+        item = PodcastItem(file_type='audio/mpeg')
+        self.assertEqual(item.media_type, 'audio')
+
+    def test_media_type_video(self):
+        item = PodcastItem(file_type='video/mpeg')
+        self.assertEqual(item.media_type, 'video')
+
+    def test_media_type_unknown(self):
+        item = PodcastItem(file_type='image/jpeg')
+        self.assertEqual(item.media_type, 'unknown')
+
+    def test_media_type_none(self):
+        pass
+        item = PodcastItem()
+        self.assertEqual(item.media_type, 'none')
