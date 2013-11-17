@@ -13,6 +13,8 @@ api_patterns = patterns(
         views.ItemListAPI.as_view(), name='api_channel_items'),
     url(r'^items/(?P<slug>[a-zA-Z\d\-\_]+)$', views.ItemDetailAPI.as_view(),
         name='api_item_details'),
+    url(r'^items/(?P<slug>[a-zA-Z\d\-\_]+)/file$',
+        views.ItemFileAPI.as_view(), name='api_item_file'),
 )
 
 urlpatterns = patterns(

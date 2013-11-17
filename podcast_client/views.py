@@ -1,8 +1,17 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
+from rest_framework import status
+from rest_framework.generics import (
+    GenericAPIView, ListCreateAPIView, RetrieveUpdateAPIView)
+from rest_framework.response import Response
 
+from . import tasks
 from .api.serializers import (
     PodcastChannelDetailSerializer, PodcastItemDetailSerializer)
 from .models import PodcastChannel, PodcastItem
+
+try:
+    from .celery import app
+except ImportError:
+    app = None
 
 
 class ChannelDetailAPI(RetrieveUpdateAPIView):
@@ -31,3 +40,32 @@ class ItemListAPI(ListCreateAPIView):
     def get_queryset(self):
         qs = super(ItemListAPI, self).get_queryset()
         return qs.filter(channel__slug=self.kwargs['slug'])
+
+
+class ItemFileAPI(GenericAPIView):
+    model = PodcastItem
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.delete_file()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        data = {}
+
+        if 'download_file' in request.GET:
+            if hasattr(tasks.download_file, 'delay'):
+                task = tasks.download_file.delay(self.object.id)
+                data = {'status': task.status, 'task_id': task.id}
+            else:
+                tasks.download_file(self.object.id)
+                data = {'status': 'SUCCESS'}
+        elif 'download_status' in request.GET:
+            if app and request.GET.get('task_id', ''):
+                result = app.AsyncResult(request.GET['task_id'])
+                data = {'status': result.status}
+            else:
+                data = {'status': 'FAILED'}
+
+        return Response(data)

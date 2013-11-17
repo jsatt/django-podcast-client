@@ -2,7 +2,7 @@ from django.test import TestCase
 import mox
 
 from podcast_client import tasks
-from podcast_client.models import PodcastChannel
+from podcast_client.models import PodcastChannel, PodcastItem
 
 try:
     import celery as celery_installed
@@ -52,4 +52,21 @@ class PodcastTasksTest(TestCase):
         self.channel2.update_channel(download=True)
         self.mock.ReplayAll()
         tasks.update_all_channels(force_download=True)
+        self.mock.VerifyAll()
+
+class DownloadFileTaskTest(TestCase):
+    def setUp(self):
+        channel = PodcastChannel.objects.create()
+        self.item = PodcastItem.objects.create(id=33, channel=channel)
+        self.mock = mox.Mox()
+
+    def tearDown(self):
+        self.mock.UnsetStubs()
+
+    def test_download_file(self):
+        self.mock.StubOutWithMock(PodcastItem, 'download_file')
+        PodcastItem.download_file()
+
+        self.mock.ReplayAll()
+        tasks.download_file(33)
         self.mock.VerifyAll()

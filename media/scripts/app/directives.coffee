@@ -50,11 +50,59 @@ angular.module('podcastClient.directives', [])
 .directive 'downloadedFile', ->
     restrict: 'E'
     replace: true
+    controller: ['$scope', '$timeout', '$window', 'Item', 'ItemFile', ($scope, $timeout, $window, Item, ItemFile) ->
+        $scope.delete_file = ->
+            if $window.confirm('Are you sure you want to delete this file from the server?')
+                ItemFile.delete {slug: $scope.item.slug}, (resp) ->
+                    $scope.item.file_downloaded = false
+
+        $scope.download_file = ->
+            $scope.fader()
+            $scope.item.file_downloaded = 'downloading'
+            ItemFile.download {slug: $scope.item.slug}, (resp) ->
+                if resp.status == 'SUCCESS'
+                    $scope.item.file_downloaded = true
+                    $scope.cancel_fader()
+                else
+                    $scope.item.task_id = resp.task_id
+                    $timeout($scope.check_download_status, 500)
+            , (resp) ->
+                $scope.item.file_downloaded = 'failed'
+                $scope.cancel_fader()
+
+        $scope.fader = ->
+            $scope.element.toggleClass('out')
+            $scope.item.fader_timeout = $timeout($scope.fader, 1000)
+
+        $scope.cancel_fader = ->
+            $timeout.cancel($scope.item.fader_timeout)
+            $scope.element.removeClass('out')
+
+        $scope.check_download_status = ->
+            ItemFile.download_status {slug: $scope.item.slug, task_id: $scope.item.task_id}, (resp) ->
+                if resp.status == 'SUCCESS'
+                    $scope.cancel_fader()
+                    Item.get {slug: $scope.item.slug}, (resp) ->
+                        $scope.item = resp
+                else if resp.status == 'FAILED'
+                    $scope.item.file_downloaded = 'failed'
+                    $scope.cancel_fader()
+                else
+                    $timeout($scope.check_download_status, 500)
+            , (resp) ->
+                $scope.item.file_downloaded = 'failed'
+                $scope.cancel_fader()
+    ]
     template: '''
         <span ng-switch="item.file_downloaded" class="downloaded_file">
-            <i class="glyphicon glyphicon-saved" ng-switch-when="true" title="Delete from Server"></i>
-            <i class="glyphicon glyphicon-save" ng-switch-when="false" title="Retrieve to Server"></i>
+            <i class="glyphicon glyphicon-saved" ng-switch-when="true" title="Delete from Server" ng-click="delete_file()"></i>
+            <i class="glyphicon glyphicon-save" ng-switch-when="false" title="Retrieve to Server" ng-click="download_file()"></i>
+            <i class="glyphicon glyphicon-import" ng-switch-when="downloading" title="Downloading"></i>
+            <i class="glyphicon glyphicon-fire" ng-switch-when="failed" title="Failed to Download" ng-click="download_file()"></i>
         </span>'''
+    link: (scope, element, attrs, ctrl) ->
+        scope.element = element
+
 
 .directive 'pagination', ->
     restrict: 'E'

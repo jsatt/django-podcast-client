@@ -15,4 +15,6 @@ img.cover{width:200px;height:200px}
 .listened i.no{color:#eb0}
 .download_new i{cursor:pointer}
 .media_type i{font-size:20px}
-.downloaded_file i{font-size:20px}
+.downloaded_file{transition:opacity 1s linear;opacity:1;}
+.downloaded_file.out{opacity:.05}
+.downloaded_file i{font-size:20px;cursor:pointer}

@@ -303,7 +303,72 @@ window.angular);
     return {
       restrict: 'E',
       replace: true,
-      template: '<span ng-switch="item.file_downloaded" class="downloaded_file">\n    <i class="glyphicon glyphicon-saved" ng-switch-when="true" title="Delete from Server"></i>\n    <i class="glyphicon glyphicon-save" ng-switch-when="false" title="Retrieve to Server"></i>\n</span>'
+      controller: [
+        '$scope', '$timeout', '$window', 'Item', 'ItemFile', function($scope, $timeout, $window, Item, ItemFile) {
+          $scope.delete_file = function() {
+            if ($window.confirm('Are you sure you want to delete this file from the server?')) {
+              return ItemFile["delete"]({
+                slug: $scope.item.slug
+              }, function(resp) {
+                return $scope.item.file_downloaded = false;
+              });
+            }
+          };
+          $scope.download_file = function() {
+            $scope.fader();
+            $scope.item.file_downloaded = 'downloading';
+            return ItemFile.download({
+              slug: $scope.item.slug
+            }, function(resp) {
+              if (resp.status === 'SUCCESS') {
+                $scope.item.file_downloaded = true;
+                return $scope.cancel_fader();
+              } else {
+                $scope.item.task_id = resp.task_id;
+                return $timeout($scope.check_download_status, 500);
+              }
+            }, function(resp) {
+              $scope.item.file_downloaded = 'failed';
+              return $scope.cancel_fader();
+            });
+          };
+          $scope.fader = function() {
+            $scope.element.toggleClass('out');
+            return $scope.item.fader_timeout = $timeout($scope.fader, 1000);
+          };
+          $scope.cancel_fader = function() {
+            $timeout.cancel($scope.item.fader_timeout);
+            return $scope.element.removeClass('out');
+          };
+          return $scope.check_download_status = function() {
+            return ItemFile.download_status({
+              slug: $scope.item.slug,
+              task_id: $scope.item.task_id
+            }, function(resp) {
+              if (resp.status === 'SUCCESS') {
+                $scope.cancel_fader();
+                return Item.get({
+                  slug: $scope.item.slug
+                }, function(resp) {
+                  return $scope.item = resp;
+                });
+              } else if (resp.status === 'FAILED') {
+                $scope.item.file_downloaded = 'failed';
+                return $scope.cancel_fader();
+              } else {
+                return $timeout($scope.check_download_status, 500);
+              }
+            }, function(resp) {
+              $scope.item.file_downloaded = 'failed';
+              return $scope.cancel_fader();
+            });
+          };
+        }
+      ],
+      template: '<span ng-switch="item.file_downloaded" class="downloaded_file">\n    <i class="glyphicon glyphicon-saved" ng-switch-when="true" title="Delete from Server" ng-click="delete_file()"></i>\n    <i class="glyphicon glyphicon-save" ng-switch-when="false" title="Retrieve to Server" ng-click="download_file()"></i>\n    <i class="glyphicon glyphicon-import" ng-switch-when="downloading" title="Downloading"></i>\n    <i class="glyphicon glyphicon-fire" ng-switch-when="failed" title="Failed to Download" ng-click="download_file()"></i>\n</span>',
+      link: function(scope, element, attrs, ctrl) {
+        return scope.element = element;
+      }
     };
   }).directive('pagination', function() {
     return {
@@ -501,6 +566,25 @@ window.angular);
       }, {
         update: {
           method: 'PATCH'
+        }
+      });
+    }
+  ]).factory('ItemFile', [
+    '$resource', function($resource) {
+      return $resource('/podcasts/api/items/:slug/file', {
+        slug: '@slug'
+      }, {
+        download: {
+          method: 'GET',
+          params: {
+            download_file: ''
+          }
+        },
+        download_status: {
+          method: 'GET',
+          params: {
+            download_status: ''
+          }
         }
       });
     }
