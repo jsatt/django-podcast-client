@@ -6,12 +6,8 @@ from rest_framework.response import Response
 from . import tasks
 from .api.serializers import (
     PodcastChannelDetailSerializer, PodcastItemDetailSerializer)
+from .celery import app
 from .models import PodcastChannel, PodcastItem
-
-try:
-    from .celery import app
-except ImportError:
-    app = None
 
 
 class ChannelDetailAPI(RetrieveUpdateAPIView):
@@ -55,14 +51,10 @@ class ItemFileAPI(GenericAPIView):
         data = {}
 
         if 'download_file' in request.GET:
-            if hasattr(tasks.download_file, 'delay'):
-                task = tasks.download_file.delay(self.object.id)
-                data = {'status': task.status, 'task_id': task.id}
-            else:
-                tasks.download_file(self.object.id)
-                data = {'status': 'SUCCESS'}
+            task = tasks.download_file.delay(self.object.id)
+            data = {'status': task.status, 'task_id': task.id}
         elif 'download_status' in request.GET:
-            if app and request.GET.get('task_id', ''):
+            if request.GET.get('task_id', ''):
                 result = app.AsyncResult(request.GET['task_id'])
                 data = {'status': result.status}
             else:

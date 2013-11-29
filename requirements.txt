@@ -3,14 +3,13 @@ South
 Django>=1.5
 django-extensions
 python-dateutil
+celery
 requests
 lxml  # requires libxslt-dev and libxml2-dev system packages
 djangorestframework
 
 # optional/suggested
 #psycopg2
-#celery
-#django-celery
 
 # install these if you intend to develop
 mox

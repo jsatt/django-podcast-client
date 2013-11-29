@@ -3,14 +3,9 @@ from django.test.client import RequestFactory
 from rest_framework import generics
 import mox
 
-from podcast_client import app as celery_app, views
+from podcast_client import views, tasks
 from podcast_client.api import serializers
 from podcast_client.models import PodcastChannel, PodcastItem
-
-try:
-    import celery as celery_installed
-except ImportError:
-    celery_installed = None
 
 
 class ChannelDetailAPITest(TestCase):
@@ -103,46 +98,23 @@ class ItemDeleteFileAPI(TestCase):
 
         self.assertEqual(resp.status_code, 204)
 
-    def test_get_download_file(self):
-        channel = PodcastChannel()
-        item = PodcastItem(id=52, channel=channel)
-        request = RequestFactory().get('')
-        request.DATA = {'download_file': ''}
+    def test_get_download_file_celery(self):
+        channel = PodcastChannel.objects.create()
+        item = PodcastItem.objects.create(id=52, channel=channel)
+        request = RequestFactory().get('', {'download_file': ''})
         self.mock.StubOutWithMock(self.view, 'get_object')
-        self.mock.StubOutWithMock(celery_app.tasks, 'download_file')
-        self.mock.StubOutWithMock(self.view, 'get_serializer')
+        self.mock.StubOutWithMock(tasks, 'download_file')
+        self.mock.StubOutWithMock(tasks.download_file, 'delay')
         self.view.get_object().AndReturn(item)
-        celery_app.tasks.download_file(52)
-        mock_serializer = self.mock.CreateMockAnything()
-        mock_serializer.data = {'serialized': 'data'}
-        self.view.get_serializer({'status': 'DONE'}).AndReturn(mock_serializer)
+        mock_task = self.mock.CreateMockAnything()
+        mock_task.id = 1234
+        mock_task.status = 'PENDING'
+        tasks.download_file.delay(52).AndReturn(mock_task)
         
         self.mock.ReplayAll()
         resp = self.view.get(request)
         self.mock.VerifyAll()
 
         self.assertEqual(resp.status_code, 200)
-        self.assertDictEqual(resp.data, {"serialized": "data"})
-
-    def test_get_download_file_celery(self):
-        if celery_installed:
-            channel = PodcastChannel.objects.create()
-            item = PodcastItem.objects.create(id=52, channel=channel)
-            request = RequestFactory().get('')
-            request.DATA = {'download_file': ''}
-            self.mock.StubOutWithMock(self.view, 'get_object')
-            self.mock.StubOutWithMock(celery_app.tasks, 'download_file')
-            self.mock.StubOutWithMock(celery_app.tasks.download_file, 'delay')
-            self.mock.StubOutWithMock(self.view, 'get_serializer')
-            self.view.get_object().AndReturn(item)
-            celery_app.tasks.download_file.delay(52)
-            mock_serializer = self.mock.CreateMockAnything()
-            mock_serializer.data = {'serialized': 'data'}
-            self.view.get_serializer({'status': 'DONE'}).AndReturn(mock_serializer)
-            
-            self.mock.ReplayAll()
-            resp = self.view.get(request)
-            self.mock.VerifyAll()
-
-            self.assertEqual(resp.status_code, 200)
-            self.assertDictEqual(resp.data, {"serialized": "data"})
+        self.assertDictEqual(
+            resp.data, {"status": "PENDING", "task_id": 1234})

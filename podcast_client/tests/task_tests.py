@@ -4,11 +4,6 @@ import mox
 from podcast_client import tasks
 from podcast_client.models import PodcastChannel, PodcastItem
 
-try:
-    import celery as celery_installed
-except ImportError:
-    celery_installed = None
-
 
 class PodcastTasksTest(TestCase):
     def setUp(self):
@@ -28,8 +23,7 @@ class PodcastTasksTest(TestCase):
         tasks.update_channel(self.channel1.slug)
         self.mock.VerifyAll()
 
-        if celery_installed:
-            self.assertTrue(hasattr(tasks.update_channel, 'apply_async'))
+        self.assertTrue(hasattr(tasks.update_channel, 'apply_async'))
 
     def test_update_channel_force_download(self):
         self.channel1.update_channel(download=True)
@@ -44,8 +38,7 @@ class PodcastTasksTest(TestCase):
         tasks.update_all_channels()
         self.mock.VerifyAll()
 
-        if celery_installed:
-            self.assertTrue(hasattr(tasks.update_all_channels, 'apply_async'))
+        self.assertTrue(hasattr(tasks.update_all_channels, 'apply_async'))
 
     def test_update_all_force_download(self):
         self.channel1.update_channel(download=True)
