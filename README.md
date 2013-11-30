@@ -41,6 +41,10 @@ Add urls in `<project name>/urls.py` (skip if only using CLI):
     (r'^podcasts/', include('podcast_client.urls')),
     )
 
+Add media files to your local static directory
+
+    ./manage.py collectstatic
+
 Setup Celery
 ------------
 Celery is used to run tasks such as downloading files and checking for updates asynchronously.
