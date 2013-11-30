@@ -49,7 +49,7 @@ Setup Celery
 ------------
 Celery is used to run tasks such as downloading files and checking for updates asynchronously.
 
-You can bypass this functionality by simply adding CELERY_ALWAYS_EAGER = True to your `settings.py`, but this is not recommended. File downloads often take longer than a normal server timeout, so it is prefered to allow Celery to perform these tasks asynchronously and allow the browser interface to update when the task is complete.
+You can bypass this functionality by simply adding `CELERY_ALWAYS_EAGER = True` to your `settings.py`, but this is not recommended. File downloads often take longer than a normal server timeout, so it is prefered to allow Celery to perform these tasks asynchronously and allow the browser interface to update when the task is complete.
 
 One of the simplest and easiest ways of getting started is using Celery 3.1+ with a Redis backend.
 
