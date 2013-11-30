@@ -11,7 +11,7 @@ Setup
 -----
 Install using pip:
 
-    pip install git://github.com/jsatt/django-podcast-client.git
+    pip install git+https://github.com/jsatt/django-podcast-client.git
 
 Create new django instance (skip this if you already have one):
 
@@ -40,6 +40,28 @@ Add urls in `<project name>/urls.py` (skip if only using CLI):
     ...
     (r'^podcasts/', include('podcast_client.urls')),
     )
+
+Setup Celery
+------------
+Celery is used to run tasks such as downloading files and checking for updates asynchronously.
+
+You can bypass this functionality by simply adding CELERY_ALWAYS_EAGER = True to your `settings.py`, but this is not recommended. File downloads often take longer than a normal server timeout, so it is prefered to allow Celery to perform these tasks asynchronously and allow the browser interface to update when the task is complete.
+
+One of the simplest and easiest ways of getting started is using Celery 3.1+ with a Redis backend.
+
+    apt-get install redis-server
+    pip install celery[redis]
+
+Add the following lines to your `settings.py`
+
+    BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+You can now run the follwing command to start the Celery worker.
+
+    export DJANGO_SETTINGS_MODULE=<project name>.settings; celery worker -A podcast_client -l info
+
+It is recommended that you setup the Celery worker to run automatically with something like Supervisord or Circus, but that is beyond the scope of this document.
 
 Using in Browser
 ----------------

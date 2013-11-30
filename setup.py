@@ -33,6 +33,7 @@ setup(name='django-podcast-client',
           'python-dateutil',
           'requests',
           'lxml',
+          'celery>=3.1',
           'djangorestframework',
       ],
       classifiers=[
