@@ -109,7 +109,7 @@ angular.module('podcastClient.directives', [])
     replace: true
     template: '''
         <ul class="pagination" ng-if="pages.length > 1">
-            <li ng-if="current_page > 1"><a ui-sref="podcast-client.channel({slug: channel.slug, page: current_page - 1})">&laquo;</a></li>
-            <li ng-repeat="page in pages" ng-class="{active: page == current_page || (page == 1 && !current_page)}"><a ui-sref="podcast-client.channel({slug: channel.slug, page: page})">[[page]]</a></li>
-            <li ng-if="current_page < pages.length"><a ui-sref="podcast-client.channel({slug: channel.slug, page: current_page + 1})">&raquo;</a></li>
+            <li ng-if="current_page > 1"><a ui-sref=".({slug: $stateParams.slug, page: current_page - 1})">&laquo;</a></li>
+            <li ng-repeat="page in pages" ng-class="{active: page == current_page || (page == 1 && !current_page)}"><a ui-sref=".({slug: $stateParams.slug, page: page})">[[page]]</a></li>
+            <li ng-if="current_page < pages.length"><a ui-sref=".({slug: $stateParams.slug, page: current_page + 1})">&raquo;</a></li>
         </ul>'''
