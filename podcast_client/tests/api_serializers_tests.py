@@ -14,8 +14,8 @@ class PodcastChannelDetailSerializerTest(TestCase):
     def test_attrs(self):
         self.assertSequenceEqual(
             self.serializer.fields.keys(),
-            ('url', 'api_url', 'title', 'slug', 'description', 'website',
-             'copyright', 'cover_url', 'download_new', 'items',
+            ('url', 'api_url', 'items_url', 'title', 'slug', 'description',
+             'website', 'copyright', 'cover_url', 'download_new',
              'has_unlistened'))
         self.assertSequenceEqual(
             self.serializer.Meta.read_only_fields,
@@ -43,7 +43,7 @@ class PodcastItemDetailSerializerTest(TestCase):
     def test_attrs(self):
         self.assertSequenceEqual(
             self.serializer.fields.keys(),
-            ('channel', 'url', 'api_url', 'title', 'slug', 'description',
+            ('url', 'api_url', 'channel_url', 'title', 'slug', 'description',
              'author', 'link', 'publish_date', 'media_type', 'listened',
              'cover_url', 'file_downloaded'))
         self.assertSequenceEqual(
