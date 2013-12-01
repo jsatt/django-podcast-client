@@ -15,7 +15,7 @@
 from setuptools import setup
 
 setup(name='django-podcast-client',
-      version='0.2.0',
+      version='0.2.1',
       description='A client for downloading and organzing podcasts.',
       author='Jeremy Satterfield',
       author_email='jsatt22@gmail.com',
