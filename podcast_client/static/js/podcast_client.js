@@ -409,8 +409,10 @@ window.angular);
             templateProvider: getTemplate('channel-list.html'),
             resolve: {
               channels: [
-                'Channel', function(Channel) {
-                  return Channel.get();
+                '$stateParams', 'Channel', function($stateParams, Channel) {
+                  return Channel.get({
+                    page: $stateParams.page
+                  });
                 }
               ]
             },
@@ -420,14 +422,11 @@ window.angular);
                 $scope.pages = [];
                 $scope.current_page = $scope.$stateParams.page ? parseInt($scope.$stateParams.page) : 1;
                 $scope.$watch('channels.results', function() {
-                  var item_count, page_count, total_channels, _i, _results;
+                  var _i, _ref, _results;
                   if ($scope.channels.results) {
-                    total_channels = $scope.channels.count;
-                    item_count = $scope.channels.results.length;
-                    page_count = Math.ceil(total_channels / item_count);
                     return $scope.pages = (function() {
                       _results = [];
-                      for (var _i = 1; 1 <= page_count ? _i <= page_count : _i >= page_count; 1 <= page_count ? _i++ : _i--){ _results.push(_i); }
+                      for (var _i = 1, _ref = $scope.channels.page_count; 1 <= _ref ? _i <= _ref : _i >= _ref; 1 <= _ref ? _i++ : _i--){ _results.push(_i); }
                       return _results;
                     }).apply(this);
                   }
@@ -468,14 +467,11 @@ window.angular);
                 $scope.pages = [];
                 $scope.current_page = $scope.$stateParams.page ? parseInt($scope.$stateParams.page) : 1;
                 $scope.$watch('items.results', function() {
-                  var item_count, page_count, total_items, _i, _results;
+                  var _i, _ref, _results;
                   if ($scope.items.results) {
-                    total_items = $scope.items.count;
-                    item_count = $scope.items.results.length;
-                    page_count = Math.ceil(total_items / item_count);
                     return $scope.pages = (function() {
                       _results = [];
-                      for (var _i = 1; 1 <= page_count ? _i <= page_count : _i >= page_count; 1 <= page_count ? _i++ : _i--){ _results.push(_i); }
+                      for (var _i = 1, _ref = $scope.items.page_count; 1 <= _ref ? _i <= _ref : _i >= _ref; 1 <= _ref ? _i++ : _i--){ _results.push(_i); }
                       return _results;
                     }).apply(this);
                   }

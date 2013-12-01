@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import pagination, serializers
 
 from podcast_client.models import PodcastChannel, PodcastItem
 
@@ -35,6 +35,11 @@ class PodcastItemSerializer(serializers.ModelSerializer):
 
     def is_file_downloaded(self, obj):
         return bool(obj and obj.file)
+
+
+class DetailPaginationSerializer(pagination.PaginationSerializer):
+    per_page = serializers.Field(source='paginator.per_page')
+    page_count = serializers.Field(source='paginator.num_pages')
 
 
 class PodcastChannelDetailSerializer(serializers.HyperlinkedModelSerializer):

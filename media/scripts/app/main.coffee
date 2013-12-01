@@ -24,8 +24,8 @@ pcApp.config ['$stateProvider', '$locationProvider', '$interpolateProvider', '$u
             content:
                 templateProvider: getTemplate('channel-list.html')
                 resolve:
-                    channels: ['Channel', (Channel) ->
-                        Channel.get()
+                    channels: ['$stateParams', 'Channel', ($stateParams, Channel) ->
+                        Channel.get({page: $stateParams.page})
                     ]
                 controller: ['$scope', 'channels', ($scope, channels) ->
                     $scope.channels = channels
@@ -34,10 +34,7 @@ pcApp.config ['$stateProvider', '$locationProvider', '$interpolateProvider', '$u
                     $scope.current_page = if $scope.$stateParams.page then parseInt($scope.$stateParams.page) else 1
                     $scope.$watch 'channels.results', () ->
                         if $scope.channels.results
-                            total_channels = $scope.channels.count
-                            item_count = $scope.channels.results.length
-                            page_count = Math.ceil(total_channels / item_count)
-                            $scope.pages = [1..page_count]
+                            $scope.pages = [1..$scope.channels.page_count]
                     $scope.$on '$stateChangeStart', (event, toState, toParams, fromState, fromParams) ->
                         toParams.parentStateParams = fromParams
                 ]
@@ -61,10 +58,7 @@ pcApp.config ['$stateProvider', '$locationProvider', '$interpolateProvider', '$u
                     $scope.current_page = if $scope.$stateParams.page then parseInt($scope.$stateParams.page) else 1
                     $scope.$watch 'items.results', () ->
                         if $scope.items.results
-                            total_items = $scope.items.count
-                            item_count = $scope.items.results.length
-                            page_count = Math.ceil(total_items / item_count)
-                            $scope.pages = [1..page_count]
+                            $scope.pages = [1..$scope.items.page_count]
                     $scope.$on '$stateChangeStart', (event, toState, toParams, fromState, fromParams) ->
                         toParams.parentStateParams = fromParams
 

@@ -5,7 +5,8 @@ from rest_framework.response import Response
 
 from . import tasks
 from .api.serializers import (
-    PodcastChannelDetailSerializer, PodcastItemDetailSerializer)
+    DetailPaginationSerializer, PodcastChannelDetailSerializer,
+    PodcastItemDetailSerializer)
 from .celery import app
 from .models import PodcastChannel, PodcastItem
 
@@ -19,6 +20,7 @@ class ChannelDetailAPI(RetrieveUpdateAPIView):
 class ChannelListAPI(ListCreateAPIView):
     model = PodcastChannel
     serializer_class = PodcastChannelDetailSerializer
+    pagination_serializer_class = DetailPaginationSerializer
     paginate_by = 10
 
 
@@ -31,6 +33,7 @@ class ItemDetailAPI(RetrieveUpdateAPIView):
 class ItemListAPI(ListCreateAPIView):
     model = PodcastItem
     serializer_class = PodcastItemDetailSerializer
+    pagination_serializer_class = DetailPaginationSerializer
     paginate_by = 10
 
     def get_queryset(self):
