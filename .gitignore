@@ -14,3 +14,4 @@ dist
 test.db
 /media/node_modules/
 /media/tmp/
+.tox
