@@ -1,4 +1,5 @@
 from lxml import etree
+from urlparse import urlparse
 import logging
 
 from django.conf import settings
@@ -132,9 +133,8 @@ class PodcastItem(models.Model):
         logger.info('Downloading - %s' % self.title)
         req = requests.get(self.url, stream=True)
         if req.ok:
-            # some downloads are tooo big to keep in memory
-            filename = req.request.path_url.split(
-                '/')[-1].split('?')[0].split('#')[0]
+            # some downloads are too big to keep in memory
+            filename = urlparse(self.url).path.split('/')[-1]
             file_path = '%s/%s' % (settings.PODCAST_DIRECTORY, filename)
             path = '%s/%s' % (settings.MEDIA_ROOT, file_path)
             with open(path, 'wb') as f:

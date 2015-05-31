@@ -35,4 +35,5 @@ INSTALLED_APPS = (
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ('--nocapture', )
 
+CELERY_RESULT_BACKEND = 'db+sqlite:///results.db'
 CELERY_ALWAYS_EAGER = True
