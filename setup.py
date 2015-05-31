@@ -13,9 +13,22 @@
 # limitations under the License.
 
 from setuptools import setup
+import os
+import sys
+
+version = '0.2.3'
+
+if sys.argv[-1] == 'publish':
+    os.system("python setup.py sdist upload")
+    sys.exit()
+
+if sys.argv[-1] == 'tag':
+    os.system("git tag -a %s -m 'version %s'" % (version, version))
+    os.system("git push --tags")
+    sys.exit()
 
 setup(name='django-podcast-client',
-      version='0.2.1',
+      version=version,
       description='A client for downloading and organzing podcasts.',
       author='Jeremy Satterfield',
       author_email='jsatt22@gmail.com',
@@ -28,13 +41,13 @@ setup(name='django-podcast-client',
       include_package_data=True,
       install_requires=[
           'South',
-          'Django>=1.5',
+          'Django>=1.5, <1.7',
           'django-extensions',
           'python-dateutil',
           'requests',
           'lxml',
           'celery>=3.1',
-          'djangorestframework',
+          'djangorestframework<3.0',
       ],
       classifiers=[
           'Development Status :: 4 - Beta',
