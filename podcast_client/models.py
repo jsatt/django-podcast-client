@@ -7,6 +7,7 @@ from django.db import models
 from django_extensions.db.models import AutoSlugField, TimeStampedModel
 import dateutil.parser
 import requests
+import transmissionrpc
 
 logger = logging.getLogger(__name__)
 
@@ -130,22 +131,29 @@ class PodcastItem(models.Model):
         return u'%s - %s' % (self.channel, self.title)
 
     def download_file(self):
-        logger.info('Downloading - %s' % self.title)
-        req = requests.get(self.url, stream=True)
-        if req.ok:
-            # some downloads are too big to keep in memory
-            filename = urlparse(self.url).path.split('/')[-1]
-            file_path = '%s/%s' % (settings.PODCAST_DIRECTORY, filename)
-            path = '%s/%s' % (settings.MEDIA_ROOT, file_path)
-            with open(path, 'wb') as f:
-                for block in req.iter_content(1024):
-                    if not block:
-                        break
-                    f.write(block)
-            self.file = file_path
-            self.save()
+        url = urlparse(self.url)
+        filename = url.path.split('/')[-1]
+        if hasattr(settings, 'TRANSMISSION') and (filename.endswith('.torrent') or url.scheme == 'magnet'):
+            logger.info('Adding Torrent - %s' % self.title)
+            tc = transmissionrpc.Client(**settings.TRANSMISSION)
+            tc.add_torrent(self.url)
         else:
-            logger.error('Failed to retrieve file. Status %s' % req.reason)
+            logger.info('Downloading - %s' % self.title)
+            req = requests.get(self.url, stream=True)
+            if req.ok:
+                # some downloads are too big to keep in memory
+                filename = urlparse(self.url).path.split('/')[-1]
+                file_path = '%s/%s' % (settings.PODCAST_DIRECTORY, filename)
+                path = '%s/%s' % (settings.MEDIA_ROOT, file_path)
+                with open(path, 'wb') as f:
+                    for block in req.iter_content(1024):
+                        if not block:
+                            break
+                        f.write(block)
+                self.file = file_path
+                self.save()
+            else:
+                logger.error('Failed to retrieve file. Status %s' % req.reason)
 
     def delete_file(self):
         if self.file:

@@ -16,7 +16,7 @@ from setuptools import setup
 import os
 import sys
 
-version = '0.2.3'
+version = '0.3.0'
 
 if sys.argv[-1] == 'publish':
     os.system("python setup.py sdist upload")
@@ -48,6 +48,7 @@ setup(name='django-podcast-client',
           'lxml',
           'celery>=3.1',
           'djangorestframework<3.0',
+          'transmissionrpc',
       ],
       classifiers=[
           'Development Status :: 4 - Beta',

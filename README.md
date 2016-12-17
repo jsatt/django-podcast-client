@@ -45,6 +45,16 @@ Add media files to your local static directory
 
     ./manage.py collectstatic
 
+If you would like to use Transmission for downloading torrent files simply add the following setting block to `<project name>/settings.py`:
+
+    TRANSMISSION = {
+        'address': '<address to transmission server>',
+        'port': '9091',
+        'user': '<username>',
+        'password': '<password>',
+    }
+
+
 Setup Celery
 ------------
 Celery is used to run tasks such as downloading files and checking for updates asynchronously.
@@ -111,7 +121,7 @@ License
 -------
 
 Django Podcast Client
-Copyright (C) 2013 Jeremy Satterfield
+Copyright (C) 2016 Jeremy Satterfield
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

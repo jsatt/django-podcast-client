@@ -7,6 +7,7 @@ celery
 requests
 lxml  # requires libxslt-dev and libxml2-dev system packages
 djangorestframework
+transmissionrpc
 
 # optional/suggested
 #psycopg2
