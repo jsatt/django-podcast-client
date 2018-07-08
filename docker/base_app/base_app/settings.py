@@ -62,15 +62,15 @@ BROKER_URL = 'django://'
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 TRANSMISSION = {}
-transmission_address = environ.get('TRANSMISSION_HOST')
+transmission_address = os.environ.get('TRANSMISSION_HOST')
 if transmission_address:
     TRANSMISSION['address'] = transmission_address
-transmission_port = environ.get('TRANSMISSION_PORT')
+transmission_port = os.environ.get('TRANSMISSION_PORT')
 if transmission_port:
     TRANSMISSION['port'] = transmission_port
-transmission_user = environ.get('TRANSMISSION_USER')
+transmission_user = os.environ.get('TRANSMISSION_USER')
 if transmission_user:
     TRANSMISSION['user'] = transmission_user
-transmission_password = environ.get('TRANSMISSION_PASSWORD')
+transmission_password = os.environ.get('TRANSMISSION_PASSWORD')
 if transmission_password:
     TRANSMISSION['password'] = transmission_password
