@@ -133,7 +133,7 @@ class PodcastItem(models.Model):
     def download_file(self):
         url = urlparse(self.url)
         filename = url.path.split('/')[-1]
-        if hasattr(settings, 'TRANSMISSION') and (filename.endswith('.torrent') or url.scheme == 'magnet'):
+        if getattr(settings, 'TRANSMISSION', {}) and (filename.endswith('.torrent') or url.scheme == 'magnet'):
             logger.info('Adding Torrent - %s' % self.title)
             tc = transmissionrpc.Client(**settings.TRANSMISSION)
             tc.add_torrent(self.url)

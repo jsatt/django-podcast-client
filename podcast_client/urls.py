@@ -20,6 +20,6 @@ api_patterns = patterns(
 urlpatterns = patterns(
     '',
     url(r'^api/', include(api_patterns)),
-    url(r'^', TemplateView.as_view(template_name='podcast_client/home.html'),
+    url(r'^$', TemplateView.as_view(template_name='podcast_client/home.html'),
         name='home'),
 )

@@ -1,14 +1,15 @@
 pip>=0.8.2
+gunicorn
 South
 Django>=1.5, <1.7
 django-extensions==1.6.7
+django-celery==3.1.17
 python-dateutil
 requests
 lxml
 celery>=3.1,<4.0
 djangorestframework<3.0
 transmissionrpc
-django-environ
 
 # optional/suggested
 #psycopg2
