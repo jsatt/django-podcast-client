@@ -1,9 +1,6 @@
 FROM python:2.7
 
-ENV UID=1000
-ENV GID=1000
-RUN addgroup --gid $GID app
-RUN adduser --uid $UID --gid $GID --quiet --gecos --disable-password app
+RUN adduser --quiet --gecos --disable-password app
 
 RUN mkdir /srv/app /downloads /data \
     && chown -R app:app /srv/app /downloads /data
@@ -11,7 +8,7 @@ WORKDIR /srv/app
 
 RUN apt-get update \
     && apt-get -y install \
-    python-dev \
+        python-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY docker/base_app/requirements.txt ./
